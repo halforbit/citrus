@@ -1,0 +1,12 @@
+c:\dev\junk\WebApp\WebApp\bin\WebApp.dll
+c:\dev\junk\WebApp\WebApp\bin\WebApp.pdb
+c:\dev\junk\WebApp\WebApp\obj\Debug\WebApp.csprojResolveAssemblyReference.cache
+c:\dev\junk\WebApp\WebApp\obj\Debug\WebApp.dll
+c:\dev\junk\WebApp\WebApp\obj\Debug\WebApp.pdb
+C:\dev\junk\Citrus\WebApp\bin\WebApp.dll
+C:\dev\junk\Citrus\WebApp\bin\WebApp.pdb
+C:\dev\junk\Citrus\WebApp\obj\Debug\WebApp.csprojResolveAssemblyReference.cache
+C:\dev\junk\Citrus\WebApp\obj\Debug\WebApp.dll
+C:\dev\junk\Citrus\WebApp\obj\Debug\WebApp.pdb
+C:\dev\junk\Citrus\WebApp\bin\Newtonsoft.Json.dll
+C:\dev\junk\Citrus\WebApp\bin\Newtonsoft.Json.xml

@@ -1,0 +1,14 @@
+C:\Dev\Citrus\ClassLibrary1\obj\Debug\Citrus.csprojResolveAssemblyReference.cache
+C:\Dev\Citrus\ClassLibrary1\bin\Debug\Citrus.dll
+C:\Dev\Citrus\ClassLibrary1\bin\Debug\Citrus.pdb
+C:\Dev\Citrus\ClassLibrary1\bin\Debug\Newtonsoft.Json.dll
+C:\Dev\Citrus\ClassLibrary1\bin\Debug\Newtonsoft.Json.xml
+C:\Dev\Citrus\ClassLibrary1\obj\Debug\Citrus.dll
+C:\Dev\Citrus\ClassLibrary1\obj\Debug\Citrus.pdb
+C:\Dev\Citrus\Citrus\bin\Debug\Citrus.dll
+C:\Dev\Citrus\Citrus\bin\Debug\Citrus.pdb
+C:\Dev\Citrus\Citrus\bin\Debug\Newtonsoft.Json.dll
+C:\Dev\Citrus\Citrus\bin\Debug\Newtonsoft.Json.xml
+C:\Dev\Citrus\Citrus\obj\Debug\Citrus.csprojResolveAssemblyReference.cache
+C:\Dev\Citrus\Citrus\obj\Debug\Citrus.dll
+C:\Dev\Citrus\Citrus\obj\Debug\Citrus.pdb

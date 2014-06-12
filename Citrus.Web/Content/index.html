@@ -1,0 +1,84 @@
+﻿<!DOCTYPE html>
+
+<html>
+
+    <head>
+
+        <title>Citrus Web Test</title>
+
+        <link 
+            rel="stylesheet" 
+            href="styles/styles.css" 
+            type="text/css" />
+
+        <script 
+            src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"
+            type="text/javascript"></script>
+
+        <script 
+            src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/2.0.0-alpha.2/handlebars.min.js"
+            type="text/javascript"></script>
+
+        <script 
+            src="//cdnjs.cloudflare.com/ajax/libs/async/0.8.0/async.js"
+            type="text/javascript"></script>
+
+        <script 
+            src="scripts/citrus-client.js"
+            type="text/javascript"></script>
+        
+        <script 
+            src="routes.js"
+            type="text/javascript"></script>
+
+    </head>
+
+    <body>
+
+        <main></main>
+
+        <script type="text/javascript">
+
+            Client.on('viewLoaded', function (event, container)
+            {
+                unobtrudeView(container);
+            });
+
+            function unobtrudeView(container)
+            {
+                // Wire up controls decorated with unobtrusive behavior attributes.
+
+                container.find('a[data-method=delete]').on('click', function ()
+                {
+                    // Wire up DELETE anchors. DELETE anchors send a DELETE request to the server 
+                    // instead of changing the client location and therefore performing a GET.
+
+                    // Decorate an <a> tag with data-method="delete" to enable this behavior.
+
+                    // The href attribute should indicate the route to DELETE to, and 
+                    // optionally, an attribute of data-success-url can be provided to indicate
+                    // what hash location should be navigated to if and when the DELETE succeeds.
+
+                    var deleteUrl = $(this).attr('href');
+
+                    var successUrl = $(this).attr('data-success-url');
+
+                    Client.delete(
+                        $(this).attr('href'),
+                        {},
+                        function (error)
+                        {
+                            if (error) throw error;
+
+                            window.location.hash = successUrl;
+                        });
+
+                    return false;
+                });
+            }
+
+        </script>
+
+    </body>
+
+</html>

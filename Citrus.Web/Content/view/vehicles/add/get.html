@@ -1,0 +1,44 @@
+﻿
+<h1>Add Vehicle</h1>
+
+<div><a href="#vehicles">Back to Vehicles</a></div>
+
+<form action="vehicles/add" method="post">
+
+    <input type="text" name="make" />
+
+    <input type="text" name="model" />
+
+    <input 
+        type="submit" 
+        value="Submit" 
+        onclick="submitForm(this); return false;" />
+
+</form>
+
+<script type="text/javascript">
+
+    function submitForm(submitButton)
+    {
+        var form = $(submitButton).closest('form');
+
+        var data = form.serializeObject();
+
+        console.dir(data);
+
+        Client.post(
+            form.attr('action'),
+            data,
+            function (error, response)
+            {
+                if (error) throw error;
+
+                console.dir(response);
+
+                window.location.hash = 'vehicles';
+            });
+
+        return false;
+    }
+
+</script>

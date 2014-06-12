@@ -1,0 +1,44 @@
+﻿
+<h1>Edit Vehicle</h1>
+
+<div><a href="#vehicles/{{vehicleId}}">Back to Vehicle</a></div>
+
+<form action="vehicles/{{vehicleId}}/edit" method="post">
+
+    <input type="text" name="make" value="{{make}}" />
+
+    <input type="text" name="model" value="{{model}}" />
+
+    <input 
+        type="submit" 
+        value="Submit" 
+        onclick="submitForm(this); return false;" />
+
+</form>
+
+<script type="text/javascript">
+
+    function submitForm(submitButton)
+    {
+        var form = $(submitButton).closest('form');
+
+        var data = form.serializeObject();
+
+        //console.dir(data);
+
+        Client.post(
+            form.attr('action'),
+            data,
+            function (error, response)
+            {
+                if (error) throw error;
+
+                console.dir(response);
+
+                window.location.hash = 'vehicles/{{vehicleId}}';
+            });
+
+        return false;
+    }
+
+</script>
