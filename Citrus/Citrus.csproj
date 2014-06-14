@@ -46,7 +46,6 @@
     <Compile Include="CitrusExtensions.cs" />
     <Compile Include="CitrusHttpHandler.cs" />
     <Compile Include="ControllerAttribute.cs" />
-    <Compile Include="Method.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RouteAttribute.cs" />
     <Compile Include="ServiceResponse.cs" />

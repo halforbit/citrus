@@ -14,9 +14,9 @@ namespace Citrus
 
     public class CitrusHttpHandler : IHttpHandler
     {
-        static Dictionary<string, string> RoutePatterns { get; set; }
+        #region Static Members
 
-        static Dictionary<Regex, MethodInfo> RouteMethods { get; set; }
+        static Dictionary<string, string> RoutePatterns { get; set; }
 
         static Type[] ControllerTypes { get; set; }
 
@@ -30,97 +30,6 @@ namespace Citrus
                 .ToArray();
 
             RoutePatterns = BuildRoutePatterns(ControllerTypes);
-
-            /*
-            var routes = assembly
-                .GetTypes()
-                .SelectMany(type => type.GetMethods())
-                .Select(method => new
-                {
-                    Route = method.GetCustomAttribute<RouteAttribute>(),
-
-                    Method = method
-                })
-                .Where(routeMethod => routeMethod.Route != null);
-
-            RouteMethods = routes.ToDictionary(
-                routeMethod => BuildRegexFromRoute(routeMethod.Route.Route),
-                routeMethod => routeMethod.Method);
-            
-            RoutePatterns = routes.ToDictionary(
-                routeMethod => BuildRegexFromRoute(routeMethod.Route.Route).ToString(),
-                routeMethod => routeMethod.Route.Route);
-            */
-        }
-
-        static Dictionary<string, string> BuildRoutePatterns(Type[] controllerTypes)
-        {
-            var routePatterns = new Dictionary<string, string>();
-
-            foreach(var controllerType in controllerTypes)
-            {
-                BuildRoutePatternsForControllerType("", controllerType, controllerType, routePatterns);
-            }
-
-            return routePatterns;
-        }
-
-        static void BuildRoutePatternsForControllerType(string routePrefix, Type rootType, Type type, Dictionary<string, string> routePatterns)
-        {
-            var segmentName = type != rootType ? type.Name : "";
-
-            if (type.GetMethod("Get") != null)
-            {
-                var route = ((routePrefix != "" ? routePrefix + "/" : "") + segmentName).PascalCaseToLowerCaseDashed();
-
-                var routeRegex = ReplacePlaceholdersWithRegex(route);
-
-                routePatterns.Add(routeRegex, route);
-            }
-
-            foreach(var nestedType in type.GetNestedTypes())
-            {
-                BuildRoutePatternsForControllerType(
-                    (routePrefix != "" ? routePrefix + "/" : "") + segmentName,
-                    rootType,
-                    nestedType,
-                    routePatterns);
-            }
-        }
-
-        static string ReplacePlaceholdersWithRegex(string route)
-        {
-            return "^" + Regex.Replace(
-                route,
-                @"_[^/$]*",
-                match => "([^/]*)") + "$";
-        }
-
-        static Regex BuildRegexFromRoute(string route)
-        {
-            return new Regex(
-                "^" + Regex.Replace(route, "{[^}]*}", "(.*)") + "$",
-                RegexOptions.Compiled);
-        }
-
-        public bool IsReusable
-        {
-            get { return true; }
-        }
-
-        public void ProcessRequest(HttpContext context)
-        {
-            if (TryServeIndex(context)) return;
-
-            if (TryServeRoutes(context)) return;
-
-            if (TryServeService(context)) return;
-
-            if (TryServeRouteAttributedService(context)) return;
-
-            if (TryServeContent(context)) return;
-
-            ServeNotFound(context);
         }
 
         static bool TryServeRoutes(HttpContext context)
@@ -139,17 +48,17 @@ namespace Citrus
             return false;
         }
 
-        static bool TryServeIndex(HttpContext context)
+        static bool TryServeIndex(HttpContext httpContext)
         {
-            if (context.Request.Url.LocalPath == "/")
+            if (httpContext.Request.Url.LocalPath == "/")
             {
-                context.Response.ContentType = "text/html";
+                httpContext.Response.ContentType = "text/html";
 
-                context.Response.ContentEncoding = Encoding.UTF8;
+                httpContext.Response.ContentEncoding = Encoding.UTF8;
 
-                context.Response.WriteFile("Content/index.html");
+                httpContext.Response.WriteFile("Content/index.html");
 
-                context.Response.End();
+                httpContext.Response.End();
 
                 return true;
             }
@@ -165,23 +74,28 @@ namespace Citrus
             {
                 var route = path.Substring("/service/".Length);
 
-                var routeSegments = route.Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
+                var routeSegments = route.Split(
+                    new char[] { '/' },
+                    StringSplitOptions.RemoveEmptyEntries);
 
                 foreach (var controllerType in ControllerTypes)
                 {
                     var routeValues = new List<string>();
 
                     var method = ResolveMethodForRoute(
-                        controllerType, 
-                        routeSegments, 
+                        controllerType,
+                        routeSegments,
                         context.Request.HttpMethod.ToLower(),
                         routeValues);
 
-                    if(method != null)
+                    if (method != null)
                     {
                         var instance = Activator.CreateInstance(method.DeclaringType);
 
-                        var arguments = BuildArgumentsForControllerMethodCall(context, method, routeValues);
+                        var arguments = BuildArgumentsForControllerMethodCall(
+                            context,
+                            method,
+                            routeValues);
 
                         var result = method.Invoke(instance, arguments);
 
@@ -208,8 +122,8 @@ namespace Citrus
         }
 
         static object[] BuildArgumentsForControllerMethodCall(
-            HttpContext context, 
-            MethodInfo method, 
+            HttpContext context,
+            MethodInfo method,
             List<string> routeValues)
         {
             var values = new Queue<string>(routeValues);
@@ -218,7 +132,7 @@ namespace Citrus
 
             var parameters = method.GetParameters();
 
-            if(!parameters.Any()) return new object[0];
+            if (!parameters.Any()) return new object[0];
 
             foreach (var parameter in parameters)
             {
@@ -230,7 +144,7 @@ namespace Citrus
 
                     arguments.Add(bodyText.JsonToDynamic());
                 }
-                else            
+                else
                 {
                     var value = values.Dequeue();
 
@@ -243,19 +157,22 @@ namespace Citrus
 
         static MethodInfo ResolveMethodForRoute(
             Type controllerType,
-            string[] routeSegments, 
+            string[] routeSegments,
             string method,
             List<string> routeValues)
         {
             if (routeSegments.Length == 0)
             {
-                return controllerType.GetMethods().FirstOrDefault(m => m.Name.PascalCaseToLowerCaseDashed() == method);
+                return controllerType
+                    .GetMethods()
+                    .FirstOrDefault(m => m.Name.PascalCaseToLowerCaseDashed() == method);
             }
             else
             {
                 var nestedTypes = controllerType.GetNestedTypes();
 
-                var nestedControllerType = nestedTypes.FirstOrDefault(t => t.Name.PascalCaseToLowerCaseDashed() == routeSegments[0]);
+                var nestedControllerType = nestedTypes
+                    .FirstOrDefault(t => t.Name.PascalCaseToLowerCaseDashed() == routeSegments[0]);
 
                 if (nestedControllerType != null)
                 {
@@ -283,63 +200,6 @@ namespace Citrus
             }
 
             return null;
-        }
-
-        static bool TryServeRouteAttributedService(HttpContext context)
-        {
-            var path = context.Request.Url.LocalPath.ToLower();
-
-            if (path.StartsWith("/service/"))
-            {
-                var route = path.Substring("/service/".Length);
-
-                foreach (var routeRegex in RouteMethods.Keys)
-                {
-                    var match = routeRegex.Match(route);
-
-                    if (match.Success)
-                    {
-                        var routeMethod = RouteMethods[routeRegex];
-
-                        var groups = match
-                            .Groups
-                            .Cast<Group>()
-                            .Skip(1)
-                            .ToArray();
-
-                        var arguments = new List<object>();
-
-                        var parameters = routeMethod.GetParameters();
-
-                        for(var i = 0; i < parameters.Length; i++)
-                        {
-                            var value = groups[i].Value;
-
-                            arguments.Add(Convert.ChangeType(value, parameters[i].ParameterType));
-                        }
-
-                        var result = routeMethod.Invoke(null, arguments.ToArray());
-
-                        var json = new ServiceResponse
-                        {
-                            Success = true,
-
-                            Response = result
-                        }
-                        .ToJson();
-
-                        context.Response.ContentType = "application/json";
-
-                        context.Response.Write(json);
-
-                        context.Response.End();
-
-                        return true;
-                    }
-                }
-            }
-
-            return false;
         }
 
         static bool TryServeContent(HttpContext context)
@@ -391,5 +251,82 @@ namespace Citrus
                 default: return null;
             }
         }
+
+        static Dictionary<string, string> BuildRoutePatterns(Type[] controllerTypes)
+        {
+            var routePatterns = new Dictionary<string, string>();
+
+            foreach(var controllerType in controllerTypes)
+            {
+                BuildRoutePatternsForControllerType(
+                    "", 
+                    controllerType, 
+                    controllerType, 
+                    routePatterns);
+            }
+
+            return routePatterns;
+        }
+
+        static void BuildRoutePatternsForControllerType(
+            string routePrefix, 
+            Type rootType, 
+            Type type, 
+            Dictionary<string, string> routePatterns)
+        {
+            var segmentName = type != rootType ? type.Name : "";
+
+            if (type.GetMethod("Get") != null)
+            {
+                var route = 
+                    ((routePrefix != "" ? routePrefix + "/" : "") + segmentName)
+                    .PascalCaseToLowerCaseDashed();
+
+                var routeRegex = ReplacePlaceholdersWithRegexPatterns(route);
+
+                routePatterns.Add(routeRegex, route);
+            }
+
+            foreach(var nestedType in type.GetNestedTypes())
+            {
+                BuildRoutePatternsForControllerType(
+                    (routePrefix != "" ? routePrefix + "/" : "") + segmentName,
+                    rootType,
+                    nestedType,
+                    routePatterns);
+            }
+        }
+
+        static string ReplacePlaceholdersWithRegexPatterns(string route)
+        {
+            return "^" + Regex.Replace(
+                route,
+                @"_[^/$]*",
+                match => "([^/]*)") + "$";
+        }
+
+        #endregion Static Members
+
+        #region Non-Static Members
+
+        public void ProcessRequest(HttpContext httpContext)
+        {
+            if (TryServeIndex(httpContext)) return;
+
+            if (TryServeRoutes(httpContext)) return;
+
+            if (TryServeService(httpContext)) return;
+
+            if (TryServeContent(httpContext)) return;
+
+            ServeNotFound(httpContext);
+        }
+
+        public bool IsReusable
+        {
+            get { return true; }
+        }
+
+        #endregion Non-Static Members
     }
 }

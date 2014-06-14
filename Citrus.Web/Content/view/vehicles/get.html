@@ -1,18 +1,21 @@
 ﻿
+<a class="button" href="#">Go back home</a>
+
 <h1>Vehicles</h1>
 
-<p>Here are some vehicles.</p>
+<p>Here are some vehicles. Pick one to see more.</p>
 
-{{#each this}}
+<ul class="action-cloud">
 
-    <div>
-        
-        <a href="#vehicles/{{vehicleId}}">{{make}} {{model}}</a>
+    {{#each this}}
 
-    </div>
+        <li><a class="button" href="#vehicles/{{vehicleId}}">{{make}} {{model}}</a></li>
 
-{{/each}}
+    {{/each}}
 
-<div><a href="#vehicles/add">Add a Vehicle</a></div>
+</ul>
 
-<div><a href="#">Go back home</a></div>
+<p>You can also add a vehicle.</p>
+
+<a class="button" href="#vehicles/add">Add a Vehicle</a>
+

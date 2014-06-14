@@ -1,13 +1,21 @@
 ﻿
-<h1>Edit Vehicle</h1>
+<a class="button" href="#vehicles/{{vehicleId}}">Back to {{make}} {{model}}</a>
 
-<div><a href="#vehicles/{{vehicleId}}">Back to Vehicle</a></div>
+<h1>Edit Vehicle</h1>
 
 <form action="vehicles/{{vehicleId}}/edit" method="post">
 
-    <input type="text" name="make" value="{{make}}" />
+    <input 
+        type="text" 
+        name="make" 
+        value="{{make}}" 
+        placeholder="Make" />
 
-    <input type="text" name="model" value="{{model}}" />
+    <input 
+        type="text" 
+        name="model" 
+        value="{{model}}"
+        placeholder="Model" />
 
     <input 
         type="submit" 
